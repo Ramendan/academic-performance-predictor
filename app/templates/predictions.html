@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Predictions{% endblock %}
 {% block page_title %}ML Predictions{% endblock %}
 
@@ -10,71 +10,99 @@
     <div class="card sticky-col">
       <div class="card-header d-flex align-items-center gap-2">
         <i class="fa-solid fa-sliders text-primary"></i>
-        <span class="fw-semibold">Student Input</span>
+        <span class="fw-semibold">Prediction Input</span>
       </div>
       <div class="card-body">
-        <form method="POST" action="{{ url_for('predictions.predictions') }}">
-          <div class="row g-3">
-            <div class="col-6">
-              <label class="form-label">Gender</label>
-              <select name="gender" class="form-select">
-                <option value="Male" {{ 'selected' if form_data.get('gender','Male')=='Male' }}>Male</option>
-                <option value="Female" {{ 'selected' if form_data.get('gender','Male')=='Female' }}>Female</option>
+
+        <!-- Mode tabs -->
+        <ul class="nav nav-pills nav-fill mb-3" id="inputModeTabs">
+          <li class="nav-item">
+            <button class="nav-link active" id="tab-student" type="button" onclick="switchMode('student')">
+              <i class="fa-solid fa-user me-1"></i>Select Student
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-custom" type="button" onclick="switchMode('custom')">
+              <i class="fa-solid fa-pen me-1"></i>Custom
+            </button>
+          </li>
+        </ul>
+
+        <form method="POST" action="{{ url_for('predictions.predictions') }}" id="predForm">
+          <input type="hidden" name="student_id" id="studentIdField" value="{{ form_data.get('student_id', '') }}" />
+
+          <!-- ── Student selector panel ── -->
+          <div id="panelStudent">
+            <div class="mb-3">
+              <label class="form-label">Choose a student</label>
+              <select id="studentDropdown" class="form-select" onchange="fillFromStudent(this.value)">
+                <option value="">— select a student —</option>
+                {% for s in students %}
+                <option value="{{ s.student_id }}"
+                  {{ 'selected' if form_data.get('student_id') == s.student_id }}>
+                  {{ s.first_name }} {{ s.last_name }}
+                </option>
+                {% endfor %}
               </select>
             </div>
-            <div class="col-6">
-              <label class="form-label">Age</label>
-              <input type="number" name="age" class="form-control" value="{{ form_data.get('age', 18) }}" min="10" max="30" />
+            {% if selected_student %}
+            <div class="alert alert-secondary py-2 small mb-3">
+              <strong>{{ selected_student.first_name }} {{ selected_student.last_name }}</strong>
+              &nbsp;&middot;&nbsp;{{ selected_student.gender }}
+              &nbsp;&middot;&nbsp;Age {{ selected_student.age | int }}
+              &nbsp;&middot;&nbsp;Grade {{ selected_student.get('grade_level', '&mdash;') }}
             </div>
-            <div class="col-12">
+            {% endif %}
+          </div>
+
+          <!-- ── Shared behavioural sliders ── -->
+          <div id="panelSliders">
+            <div class="mb-3">
               <label class="form-label">Attendance %
-                <span class="badge bg-secondary ms-1" id="attendanceBadge">{{ form_data.get('attendance_pct', 75) }}%</span>
+                <span class="badge bg-secondary ms-1" id="attendanceBadge">{{ form_data.get('attendance_pct', 75) | int }}%</span>
               </label>
-              <input type="range" name="attendance_pct" class="form-range" min="0" max="100" step="1"
+              <input type="range" name="attendance_pct" id="sliderAttendance" class="form-range" min="0" max="100" step="1"
                      value="{{ form_data.get('attendance_pct', 75) }}"
                      oninput="document.getElementById('attendanceBadge').textContent=this.value+'%'" />
             </div>
-            <div class="col-12">
-              <label class="form-label">Study Hours/Week
+            <div class="mb-3">
+              <label class="form-label">Study Hours / Week
                 <span class="badge bg-secondary ms-1" id="studyBadge">{{ form_data.get('study_hours_per_week', 7) }}h</span>
               </label>
-              <input type="range" name="study_hours_per_week" class="form-range" min="0" max="20" step="0.5"
+              <input type="range" name="study_hours_per_week" id="sliderStudy" class="form-range" min="0" max="20" step="0.5"
                      value="{{ form_data.get('study_hours_per_week', 7) }}"
                      oninput="document.getElementById('studyBadge').textContent=this.value+'h'" />
             </div>
-            <div class="col-12">
-              <label class="form-label">Assignments (out of 12)
-                <span class="badge bg-secondary ms-1" id="assignBadge">{{ form_data.get('assignments_submitted', 8) }}</span>
+            <div class="mb-3">
+              <label class="form-label">Assignments Submitted (out of 12)
+                <span class="badge bg-secondary ms-1" id="assignBadge">{{ form_data.get('assignments_submitted', 8) | int }}</span>
               </label>
-              <input type="range" name="assignments_submitted" class="form-range" min="0" max="12" step="1"
+              <input type="range" name="assignments_submitted" id="sliderAssign" class="form-range" min="0" max="12" step="1"
                      value="{{ form_data.get('assignments_submitted', 8) }}"
                      oninput="document.getElementById('assignBadge').textContent=this.value" />
             </div>
-            <div class="col-12">
+            <div class="mb-3">
               <label class="form-label">Previous GPA
                 <span class="badge bg-secondary ms-1" id="gpaBadge">{{ form_data.get('previous_gpa', 2.5) }}</span>
               </label>
-              <input type="range" name="previous_gpa" class="form-range" min="0" max="4" step="0.1"
+              <input type="range" name="previous_gpa" id="sliderGpa" class="form-range" min="0" max="4" step="0.1"
                      value="{{ form_data.get('previous_gpa', 2.5) }}"
                      oninput="document.getElementById('gpaBadge').textContent=parseFloat(this.value).toFixed(1)" />
             </div>
-            <div class="col-12"><hr class="my-1" /><p class="mb-2 fw-semibold small">Subject Scores (0–100)</p></div>
-            {% for subj in ['math','science','english','history','cs'] %}
-            <div class="col-12">
-              <label class="form-label text-capitalize">{{ subj }}
-                <span class="badge bg-secondary ms-1" id="{{ subj }}Badge">{{ form_data.get(subj, 60) }}</span>
-              </label>
-              <input type="range" name="{{ subj }}" class="form-range" min="0" max="100" step="1"
-                     value="{{ form_data.get(subj, 60) }}"
-                     oninput="document.getElementById('{{ subj }}Badge').textContent=this.value" />
-            </div>
-            {% endfor %}
-            <div class="col-12 mt-2">
-              <button type="submit" class="btn btn-primary w-100">
-                <i class="fa-solid fa-brain me-2"></i>Run Predictions
-              </button>
+
+            <!-- Custom-only: gender picker (hidden when student selected) -->
+            <div id="genderRow" class="mb-3" style="display:none;">
+              <label class="form-label">Gender</label>
+              <select name="gender" id="genderSelect" class="form-select">
+                <option value="Male"   {{ 'selected' if form_data.get('gender','Male')=='Male' }}>Male</option>
+                <option value="Female" {{ 'selected' if form_data.get('gender','Male')=='Female' }}>Female</option>
+              </select>
             </div>
           </div>
+
+          <button type="submit" class="btn btn-primary w-100 mt-1" id="submitBtn" disabled>
+            <i class="fa-solid fa-brain me-2"></i>Run Predictions
+          </button>
         </form>
       </div>
     </div>
@@ -87,7 +115,12 @@
     {% if prediction_results %}
     <div class="row g-3 mb-4">
       <div class="col-12">
-        <h6 class="text-muted mb-3"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Prediction Results</h6>
+        <h6 class="text-muted mb-3">
+          <i class="fa-solid fa-wand-magic-sparkles me-1"></i>Prediction Results
+          {% if selected_student %}
+          <span class="ms-2 text-white">&mdash; {{ selected_student.first_name }} {{ selected_student.last_name }}</span>
+          {% endif %}
+        </h6>
       </div>
       {% for key, res in prediction_results.items() %}
       <div class="col-12 col-md-6">
@@ -155,7 +188,7 @@
                       <div class="metric-chip-value text-warning">{{ m.rmse }}</div>
                     </div>
                     <div class="metric-chip">
-                      <div class="metric-chip-label">R² Score</div>
+                      <div class="metric-chip-label">R2 Score</div>
                       <div class="metric-chip-value text-success">{{ m.r2 }}</div>
                     </div>
                   </div>
@@ -187,7 +220,7 @@
 
         <!-- Model Comparison Chart -->
         <div class="mt-4">
-          <h6 class="text-muted mb-2">Classification Models — Accuracy Comparison</h6>
+          <h6 class="text-muted mb-2">Classification Models - Accuracy Comparison</h6>
           <div class="chart-wrapper" style="max-height:220px;">
             <canvas id="modelCompareChart"></canvas>
           </div>
@@ -208,19 +241,69 @@
 
 {% block scripts %}
 <script>
-const metrics = {{ metrics_json | safe }};
+const metricsData = {{ metrics_json | safe }};
+const studentsData = {{ students_json | safe }};
 
-const classMetrics = Object.values(metrics).filter(m => m.type === 'classification');
+function switchMode(mode) {
+  document.getElementById('tab-student').classList.toggle('active', mode === 'student');
+  document.getElementById('tab-custom').classList.toggle('active', mode === 'custom');
+  if (mode === 'custom') {
+    document.getElementById('panelStudent').style.display = 'none';
+    document.getElementById('studentIdField').value = '';
+    document.getElementById('genderRow').style.display = '';
+    enableSubmit(true);
+  } else {
+    document.getElementById('panelStudent').style.display = '';
+    document.getElementById('genderRow').style.display = 'none';
+    enableSubmit(!!document.getElementById('studentDropdown').value);
+  }
+}
+
+function enableSubmit(on) {
+  document.getElementById('submitBtn').disabled = !on;
+}
+
+function fillFromStudent(sid) {
+  document.getElementById('studentIdField').value = sid;
+  enableSubmit(!!sid);
+  if (!sid) return;
+  const s = studentsData.find(x => String(x.student_id) === String(sid));
+  if (!s) return;
+  setSlider('sliderAttendance', 'attendanceBadge', s.attendance_pct, v => Math.round(v) + '%');
+  setSlider('sliderStudy',      'studyBadge',      s.study_hours_per_week, v => v + 'h');
+  setSlider('sliderAssign',     'assignBadge',      s.assignments_submitted, v => Math.round(v));
+  setSlider('sliderGpa',        'gpaBadge',         s.previous_gpa, v => parseFloat(v).toFixed(1));
+}
+
+function setSlider(sliderId, badgeId, value, fmt) {
+  const el = document.getElementById(sliderId);
+  if (!el) return;
+  el.value = value;
+  document.getElementById(badgeId).textContent = fmt(value);
+}
+
+(function init() {
+  const preselected = '{{ form_data.get("student_id", "") }}';
+  if (preselected) {
+    document.getElementById('studentDropdown').value = preselected;
+    enableSubmit(true);
+    switchMode('student');
+  } else {
+    switchMode('student');
+  }
+})();
+
+const classMetrics = Object.values(metricsData).filter(m => m.type === 'classification');
 if (classMetrics.length > 0) {
   new Chart(document.getElementById('modelCompareChart').getContext('2d'), {
     type: 'bar',
     data: {
       labels: classMetrics.map(m => m.name),
       datasets: [
-        { label: 'Accuracy', data: classMetrics.map(m => +(m.accuracy*100).toFixed(1)), backgroundColor: '#198754', borderRadius: 4 },
+        { label: 'Accuracy',  data: classMetrics.map(m => +(m.accuracy*100).toFixed(1)),  backgroundColor: '#198754', borderRadius: 4 },
         { label: 'Precision', data: classMetrics.map(m => +(m.precision*100).toFixed(1)), backgroundColor: '#0dcaf0', borderRadius: 4 },
-        { label: 'Recall', data: classMetrics.map(m => +(m.recall*100).toFixed(1)), backgroundColor: '#ffc107', borderRadius: 4 },
-        { label: 'F1', data: classMetrics.map(m => +(m.f1*100).toFixed(1)), backgroundColor: '#0d6efd', borderRadius: 4 },
+        { label: 'Recall',    data: classMetrics.map(m => +(m.recall*100).toFixed(1)),    backgroundColor: '#ffc107', borderRadius: 4 },
+        { label: 'F1',        data: classMetrics.map(m => +(m.f1*100).toFixed(1)),        backgroundColor: '#0d6efd', borderRadius: 4 },
       ]
     },
     options: {

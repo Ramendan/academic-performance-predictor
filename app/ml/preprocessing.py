@@ -11,11 +11,6 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 FEATURE_COLS = [
     "attendance_pct",
-    "math",
-    "science",
-    "english",
-    "history",
-    "cs",
     "assignments_submitted",
     "study_hours_per_week",
     "previous_gpa",

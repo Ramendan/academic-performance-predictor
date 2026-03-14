@@ -36,7 +36,7 @@ LAST_NAMES = [
 ]
 
 
-def generate_students(n=100):
+def generate_students(n=500):
     records = []
     for i in range(1, n + 1):
         gender = random.choice(["Male", "Female"])
@@ -45,16 +45,17 @@ def generate_students(n=100):
         name = f"{first} {last}"
         age = random.randint(15, 22)
 
-        # Previous GPA drives performance level
-        prev_gpa = round(np.random.beta(5, 2) * 4.0, 2)
+        # Previous GPA: normal distribution centred at 2.5 → perf spread across all grade bands
+        prev_gpa = round(float(np.clip(np.random.normal(2.5, 0.75), 0.3, 4.0)), 2)
         perf_factor = prev_gpa / 4.0  # 0–1
 
-        attendance = round(np.clip(np.random.normal(75 + perf_factor * 20, 10), 30, 100), 1)
-        study_hours = round(np.clip(np.random.normal(5 + perf_factor * 10, 3), 1, 20), 1)
-        assignments = random.randint(max(1, int(perf_factor * 8)), 12)
+        attendance = round(float(np.clip(np.random.normal(60 + perf_factor * 35, 10), 20, 100)), 1)
+        study_hours = round(float(np.clip(np.random.normal(2 + perf_factor * 14, 3), 0.5, 20)), 1)
+        assignments = random.randint(max(0, int(perf_factor * 6)), 12)
 
+        # Score range: low performer (~40) → high performer (~95), std=12 per subject
         def subject_score():
-            base = perf_factor * 60 + np.random.normal(20, 12)
+            base = 40 + perf_factor * 55 + np.random.normal(0, 12)
             return int(np.clip(base, 10, 100))
 
         math = subject_score()
@@ -89,6 +90,6 @@ def generate_students(n=100):
 if __name__ == "__main__":
     out_dir = os.path.dirname(os.path.abspath(__file__))
     out_path = os.path.join(out_dir, "sample_students.csv")
-    df = generate_students(100)
+    df = generate_students(500)
     df.to_csv(out_path, index=False)
     print(f"Generated {len(df)} student records → {out_path}")
