@@ -11,24 +11,34 @@ A full-stack web application for monitoring student academic records and predict
 - **Performance Analytics** — Top/bottom performers, GPA histogram, gender comparison, attendance scatter plot
 - **ML Predictions** — Four models (Linear Regression, Logistic Regression, Random Forest, Decision Tree) with live evaluation metrics
 - **At-Risk Detection** — Automatic flagging of students with low scores or attendance
-- **100 Demo Students** — Works out of the box with realistic sample data
+- **100 Arabic-Named Demo Students** — Works out of the box with realistic sample data
 
 ---
 
 ## Quick Start
 
-### Prerequisites
+### Option A — One-click launcher (recommended)
+
+**Windows:** Double-click `run.bat` — it auto-creates the virtual environment, installs all dependencies, generates sample data, and opens the app in your browser.
+
+**macOS / Linux:** Run `bash run.sh` — same behaviour.
+
+---
+
+### Option B — Manual setup
+
+#### Prerequisites
 - Python 3.10+
 - pip
 
-### 1. Clone the repository
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Ramendan/academic-performance-predictor.git
 cd academic-performance-predictor
 ```
 
-### 2. Create and activate a virtual environment
+#### 2. Create and activate a virtual environment
 
 **Windows (PowerShell):**
 ```powershell
@@ -42,13 +52,13 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install all dependencies
+#### 3. Install all dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Generate sample data
+#### 4. Generate sample data
 
 ```bash
 python app/data/generate_sample_data.py
@@ -68,33 +78,36 @@ Open your browser at: **http://127.0.0.1:5000**
 
 ```
 academic-performance-predictor/
-├── app/
-│   ├── __init__.py              ← Flask app factory
-│   ├── routes/
-│   │   ├── main.py              ← Dashboard route
-│   │   ├── students.py          ← Student CRUD routes
-│   │   ├── analytics.py         ← Analytics route
-│   │   └── predictions.py       ← ML prediction route
-│   ├── ml/
-│   │   ├── preprocessing.py     ← Feature engineering & scaling
-│   │   ├── trainer.py           ← Model training
-│   │   └── predictor.py         ← Prediction interface
-│   ├── data/
-│   │   ├── data_loader.py       ← Data access layer
-│   │   ├── generate_sample_data.py
-│   │   └── sample_students.csv  ← 100 demo students
-│   ├── templates/               ← Jinja2 HTML templates
-│   └── static/                  ← CSS & JS
-├── docs/                        ← Project documentation
-│   ├── 01_project_overview.md
-│   ├── 02_data_collection_management.md
-│   ├── 03_performance_analysis.md
-│   ├── 04_ml_prediction_models.md
-│   └── 05_deployment_guide.md
+├── run.bat                      ← Windows one-click launcher
+├── run.sh                       ← macOS/Linux one-click launcher
+├── run.py                       ← Flask entry point
 ├── config.py
-├── run.py
 ├── requirements.txt
-└── .gitignore
+├── .gitignore
+├── README.md
+├── app/
+│   ├── __init__.py
+│   ├── routes/
+│   │   ├── main.py
+│   │   ├── students.py
+│   │   ├── analytics.py
+│   │   └── predictions.py
+│   ├── ml/
+│   │   ├── preprocessing.py
+│   │   ├── trainer.py
+│   │   └── predictor.py
+│   ├── data/
+│   │   ├── data_loader.py
+│   │   ├── generate_sample_data.py
+│   │   └── sample_students.csv   ← 100 Arabic-named demo students
+│   ├── templates/
+│   └── static/
+└── docs/
+    ├── 01_project_overview.md
+    ├── 02_data_collection_management.md
+    ├── 03_performance_analysis.md
+    ├── 04_ml_prediction_models.md
+    └── 05_deployment_guide.md
 ```
 
 ---

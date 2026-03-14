@@ -1,5 +1,23 @@
 # 05 — Deployment Guide
 
+## Quick Start — One-Click Launchers
+
+### Windows
+Double-click **`run.bat`** in the project root. It will:
+1. Check that Python is installed
+2. Create a virtual environment (`venv/`) if one doesn't exist
+3. Install all dependencies from `requirements.txt`
+4. Generate `sample_students.csv` if not present
+5. Start the server and open `http://127.0.0.1:5000` in your browser
+
+### macOS / Linux
+```bash
+bash run.sh
+```
+Same steps as above using `python3` and `venv/bin/activate`.
+
+---
+
 ## Prerequisites
 
 - Python 3.10 or newer

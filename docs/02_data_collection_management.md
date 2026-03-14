@@ -40,7 +40,7 @@ The student data is stored in `app/data/students.csv` (created on first run from
 
 ## Sample Data Generation
 
-A script generates 100 realistic synthetic students using NumPy's random distributions:
+A script generates 100 realistic synthetic students using NumPy's random distributions, with gender-appropriate Arabic names from curated name lists for male and female students:
 
 ```bash
 python app/data/generate_sample_data.py

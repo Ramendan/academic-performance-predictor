@@ -31,7 +31,13 @@ def predictions():
             "study_hours_per_week": _safe_float(request.form.get("study_hours_per_week", "7")),
             "previous_gpa": _safe_float(request.form.get("previous_gpa", "2.5")),
         }
-        prediction_results = predict_student(form_data)
+        raw = predict_student(form_data)
+        # Guard: if models couldn't be trained, raw is {"error": "..."}
+        if "error" in raw:
+            flash(raw["error"], "warning")
+            prediction_results = None
+        else:
+            prediction_results = raw
 
     return render_template(
         "predictions.html",

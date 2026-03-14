@@ -11,30 +11,38 @@ import pandas as pd
 random.seed(42)
 np.random.seed(42)
 
-FIRST_NAMES = [
-    "Alice", "Bob", "Charlie", "Diana", "Ethan", "Fiona", "George", "Hannah",
-    "Ivan", "Julia", "Kevin", "Laura", "Michael", "Nina", "Oscar", "Priya",
-    "Quinn", "Rachel", "Sam", "Tina", "Uma", "Victor", "Wendy", "Xander",
-    "Yasmine", "Zack", "Aisha", "Brandon", "Carol", "David", "Elena", "Frank",
-    "Grace", "Henry", "Irene", "James", "Karen", "Leo", "Mia", "Nathan",
-    "Olivia", "Peter", "Queenie", "Ryan", "Sara", "Tom", "Ursula", "Vince",
-    "Willow", "Xin",
+MALE_FIRST_NAMES = [
+    "Ahmed", "Mohamed", "Ali", "Omar", "Hassan", "Ibrahim", "Khalid",
+    "Yousef", "Samir", "Tariq", "Walid", "Faisal", "Nasser", "Ziad",
+    "Bilal", "Rami", "Karim", "Hani", "Sami", "Adel", "Wael", "Majid",
+    "Saleh", "Fahad", "Abdullah", "Marwan", "Nabil", "Hamza", "Anas",
+    "Bassem", "Tarek", "Amr", "Mahmoud", "Khaled", "Osama", "Yasser",
+    "Raed", "Ayman", "Fawzi", "Jihad",
+]
+
+FEMALE_FIRST_NAMES = [
+    "Fatima", "Layla", "Amira", "Nour", "Sara", "Rania", "Hana", "Dina",
+    "Mona", "Aya", "Salma", "Lina", "Rana", "Heba", "Noura", "Yasmin",
+    "Reem", "Sana", "Dalal", "Ghada", "Wafa", "Nada", "Ruba", "Aisha",
+    "Manar", "Duaa", "Iman", "Suha", "Lubna", "Abeer", "Amal", "Basma",
+    "Dalia", "Enas", "Hadeel", "Inas", "Jumana", "Khadija", "Maram", "Nawal",
 ]
 
 LAST_NAMES = [
-    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller",
-    "Davis", "Wilson", "Taylor", "Anderson", "Thomas", "Jackson", "White",
-    "Harris", "Martin", "Thompson", "Robinson", "Clark", "Lewis",
+    "Al-Hassan", "Al-Rashid", "Al-Mansouri", "Al-Farsi", "Al-Zahrani",
+    "Al-Siddiqui", "Al-Amin", "Al-Masri", "Al-Shammari", "Al-Otaibi",
+    "Al-Harbi", "Al-Ghamdi", "Al-Qahtani", "Al-Dosari", "Al-Balushi",
+    "Al-Tamimi", "Al-Nasser", "Al-Khalidi", "Al-Amiri", "Qureshi",
 ]
 
 
 def generate_students(n=100):
     records = []
     for i in range(1, n + 1):
-        first = random.choice(FIRST_NAMES)
+        gender = random.choice(["Male", "Female"])
+        first = random.choice(MALE_FIRST_NAMES if gender == "Male" else FEMALE_FIRST_NAMES)
         last = random.choice(LAST_NAMES)
         name = f"{first} {last}"
-        gender = random.choice(["Male", "Female"])
         age = random.randint(15, 22)
 
         # Previous GPA drives performance level
